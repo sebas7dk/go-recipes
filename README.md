@@ -60,5 +60,5 @@ curl -i http://127.0.0.1:7000/api/v1.0/recipes
 Expected response:
 
 ```
-[{"id":"AVP_q_Xc6hie8WoeSicN","title":"miso soup","category":"asian","ingredients":"miso, rice noodles,noodles","instructions":"broth de broth","time":60,"people":2}]
+[{"id":"AVP_q_Xc6hie8WoeSicN","title":"miso soup","category":"asian","ingredients":"miso, rice noodles,noodles","instructions":"boil it for 60 minutes","time":60,"people":2}]
 ```
