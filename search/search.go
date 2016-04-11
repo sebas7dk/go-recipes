@@ -2,12 +2,17 @@ package search
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/go-recipes/config"
 	"github.com/go-recipes/models"
 	elastigo "github.com/mattbaird/elastigo/lib"
 )
+
+type Connection struct {
+	Conn *elastigo.Conn
+}
 
 var index string
 
@@ -16,18 +21,20 @@ func SetIndex(i string) {
 	index = i
 }
 
-//Connect create a new Elastic Search connection
-func Connect() *elastigo.Conn {
+//NewConnection create a new Elastic Search connection
+func NewConnection() (*elastigo.Conn, err) {
 	c := elastigo.NewConn()
 	c.Domain = config.ENV["ES_DOMAIN"]
 	c.Port = config.ENV["ES_PORT"]
+	if c == nil {
+		return nil, errors.New("Error connection")
+	}
 
-	return c
+	return c, nil
 }
 
 //Show all the docs in the index
-func Show() ([]models.Recipe, error) {
-	c := Connect()
+func (c *Connection) Show() ([]models.Recipe, error) {
 
 	searchJSON := `{
       "query" : {

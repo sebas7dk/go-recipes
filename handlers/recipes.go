@@ -37,7 +37,7 @@ func ShowAll(w http.ResponseWriter, r *http.Request) {
 }
 
 //SearchRecipe search the recipe
-func SearchRecipe(w http.ResponseWriter, r *http.Request) {
+func SearchRecipe(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 
 	if r, err := search.Query(string(vars["term"])); err != nil {
@@ -45,9 +45,11 @@ func SearchRecipe(w http.ResponseWriter, r *http.Request) {
 	} else {
 		BuildResponse(w, "ok")
 		if err := json.NewEncoder(w).Encode(r); err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 //ShowRecipeById find the recipe by id
@@ -125,29 +127,26 @@ func ValidJsonBody(w http.ResponseWriter, r *http.Request) []byte {
 
 //BuildResponse Build the headers and return a json encoded error if needed
 func BuildResponse(w http.ResponseWriter, s string) {
-	var e bool
-	var t string
-	var c int
 
 	switch s {
 	case "not_found":
-		c = http.StatusNotFound
-		t = "Recipe not found"
-		e = true
+		c := http.StatusNotFound
+		t := "Recipe not found"
+		e := true
 	case "bad_request":
-		c = http.StatusBadRequest
-		t = "Unable to create recipe, field is missing"
-		e = true
+		c := http.StatusBadRequest
+		t := "Unable to create recipe, field is missing"
+		e := true
 	case "unprocessed":
-		c = 422
-		t = "Unable to process the json body"
-		e = true
+		c := 422
+		t := "Unable to process the json body"
+		e := true
 	case "ok":
-		c = http.StatusOK
-		e = false
+		c := http.StatusOK
+		e := false
 	case "created":
-		c = http.StatusCreated
-		e = false
+		c := http.StatusCreated
+		e := false
 	default:
 		log.Fatal("unrecognized status")
 	}

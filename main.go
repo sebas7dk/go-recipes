@@ -15,6 +15,12 @@ func main() {
 		log.Fatal("Error loading the .env file")
 	}
 
+	c, err := search.NewConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer search.Conn.Close()
+
 	search.SetIndex(config.ENV["ES_INDEX"])
 
 	r := router.NewRouter()

@@ -10,14 +10,12 @@ import (
 )
 
 var (
-	StrValues = map[string]string{
+	StrValues = map[string]interface{}{
 		"title":        "Fruit Recipe",
 		"ingredients":  "apple, pear, kiwi, banana",
 		"instructions": "Cut the fruit and put it in a bowl.",
-	}
-	IntValues = map[string]int{
-		"time":   10,
-		"people": 2,
+		"time":         10,
+		"people":       2,
 	}
 	recipeId string
 )
