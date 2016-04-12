@@ -16,8 +16,7 @@ run:
 	./$(BIN)
 
 deps:
-	go get github.com/stretchr/testify/require
-	go get ./...
+	go get -v -t ./...
 
 fmt:
 	go fmt ./...

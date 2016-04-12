@@ -2,12 +2,19 @@ package config
 
 import "github.com/joho/godotenv"
 
-var ENV map[string]string
+//Env environemnt
+var Env map[string]string
 
+//NewConfig read the .env file
 func NewConfig(path string) error {
 	var err error
 
-	ENV, err = godotenv.Read(path)
+	Env, err = godotenv.Read(path)
 
 	return err
+}
+
+// Get the config variable
+func Get(field string) string {
+	return Env[field]
 }
