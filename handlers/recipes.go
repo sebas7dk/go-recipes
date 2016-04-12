@@ -19,14 +19,20 @@ type jsonError struct {
 	Message string `json:"message"`
 }
 
+var c *search.Connection
+
+func SetConnection(conn *search.Connection) {
+	c = conn
+}
+
 //Index show the welcome message
 func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Welcome to Go Recipe "+config.ENV["APP_VERSION"])
+	fmt.Fprint(w, "Welcome to Go Recipe "+config.Get("APP_VERSION"))
 }
 
 //ShowAll show all recipes
 func ShowAll(w http.ResponseWriter, r *http.Request) {
-	if r, err := search.Show(); err != nil {
+	if r, err := c.Show(); err != nil {
 		BuildResponse(w, "not_found")
 	} else {
 		BuildResponse(w, "ok")
@@ -37,26 +43,24 @@ func ShowAll(w http.ResponseWriter, r *http.Request) {
 }
 
 //SearchRecipe search the recipe
-func SearchRecipe(w http.ResponseWriter, r *http.Request) error {
+func SearchRecipe(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	if r, err := search.Query(string(vars["term"])); err != nil {
+	if r, err := c.Query(string(vars["term"])); err != nil {
 		BuildResponse(w, "not_found")
 	} else {
 		BuildResponse(w, "ok")
 		if err := json.NewEncoder(w).Encode(r); err != nil {
-			return err
+			log.Fatal(err)
 		}
 	}
-
-	return nil
 }
 
 //ShowRecipeById find the recipe by id
 func ShowRecipeById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	if r, err := search.GetById(string(vars["id"])); err != nil {
+	if r, err := c.GetById(string(vars["id"])); err != nil {
 		BuildResponse(w, "not_found")
 	} else {
 		BuildResponse(w, "ok")
@@ -75,7 +79,7 @@ func CreateRecipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := search.Create(recipe); err != nil {
+	if _, err := c.Create(recipe); err != nil {
 		fmt.Println(err)
 		BuildResponse(w, "bad_request")
 	} else {
@@ -93,7 +97,7 @@ func UpdateRecipeById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := search.Update(vars["id"], recipe); err != nil {
+	if _, err := c.Update(vars["id"], recipe); err != nil {
 		BuildResponse(w, "bad_request")
 	} else {
 		BuildResponse(w, "ok")
@@ -104,7 +108,7 @@ func UpdateRecipeById(w http.ResponseWriter, r *http.Request) {
 func DestroyRecipeById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	if _, err := search.Delete(vars["id"]); err != nil {
+	if _, err := c.Delete(vars["id"]); err != nil {
 		BuildResponse(w, "not_found")
 	} else {
 		BuildResponse(w, "ok")
@@ -127,26 +131,29 @@ func ValidJsonBody(w http.ResponseWriter, r *http.Request) []byte {
 
 //BuildResponse Build the headers and return a json encoded error if needed
 func BuildResponse(w http.ResponseWriter, s string) {
+	var c int
+	var t string
+	var e bool
 
 	switch s {
 	case "not_found":
-		c := http.StatusNotFound
-		t := "Recipe not found"
-		e := true
+		c = http.StatusNotFound
+		t = "Recipe not found"
+		e = true
 	case "bad_request":
-		c := http.StatusBadRequest
-		t := "Unable to create recipe, field is missing"
-		e := true
+		c = http.StatusBadRequest
+		t = "Unable to create recipe, field is missing"
+		e = true
 	case "unprocessed":
-		c := 422
-		t := "Unable to process the json body"
-		e := true
+		c = 422
+		t = "Unable to process the json body"
+		e = true
 	case "ok":
-		c := http.StatusOK
-		e := false
+		c = http.StatusOK
+		e = false
 	case "created":
-		c := http.StatusCreated
-		e := false
+		c = http.StatusCreated
+		e = false
 	default:
 		log.Fatal("unrecognized status")
 	}

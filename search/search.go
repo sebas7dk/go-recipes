@@ -22,38 +22,39 @@ func SetIndex(i string) {
 }
 
 //NewConnection create a new Elastic Search connection
-func NewConnection() (*elastigo.Conn, err) {
+func NewConnection() (*Connection, error) {
 	c := elastigo.NewConn()
-	c.Domain = config.ENV["ES_DOMAIN"]
-	c.Port = config.ENV["ES_PORT"]
 	if c == nil {
-		return nil, errors.New("Error connection")
+		return nil, errors.New("Unable to connect to Elastic Search")
 	}
 
-	return c, nil
+	c.Domain = config.Get("ES_DOMAIN")
+	c.Port = config.Get("ES_PORT")
+
+	conn := &Connection{Conn: c}
+
+	return conn, nil
 }
 
 //Show all the docs in the index
 func (c *Connection) Show() ([]models.Recipe, error) {
-
 	searchJSON := `{
       "query" : {
           "match_all" : {}
       }
   }`
 
-	o, err := c.Search(index, "recipe", nil, searchJSON)
+	o, err := c.Conn.Search(index, "recipe", nil, searchJSON)
 	r := BuildResults(o.Hits.Hits)
 
 	return r, err
 }
 
 //GetById show the doc by id
-func GetById(id string) (*models.Recipe, error) {
+func (c *Connection) GetById(id string) (*models.Recipe, error) {
 	var recipe *models.Recipe
 
-	c := Connect()
-	o, err := c.Get(index, "recipe", id, nil)
+	o, err := c.Conn.Get(index, "recipe", id, nil)
 
 	if err == nil {
 		json.Unmarshal(*o.Source, &recipe)
@@ -64,21 +65,17 @@ func GetById(id string) (*models.Recipe, error) {
 }
 
 //Create a new doc
-func Create(r models.Recipe) (elastigo.BaseResponse, error) {
-	c := Connect()
-	return c.Index(index, "recipe", "", nil, r)
+func (c *Connection) Create(r models.Recipe) (elastigo.BaseResponse, error) {
+	return c.Conn.Index(index, "recipe", "", nil, r)
 }
 
 //Update a doc by id
-func Update(id string, r models.Recipe) (elastigo.BaseResponse, error) {
-	c := Connect()
-	return c.Index(index, "recipe", id, nil, r)
+func (c *Connection) Update(id string, r models.Recipe) (elastigo.BaseResponse, error) {
+	return c.Conn.Index(index, "recipe", id, nil, r)
 }
 
 //Query the index and match the search term
-func Query(s string) ([]models.Recipe, error) {
-	c := Connect()
-
+func (c *Connection) Query(s string) ([]models.Recipe, error) {
 	searchJSON := fmt.Sprintf(`{
 	    "query" : {
 	        "multi_match": {
@@ -88,22 +85,20 @@ func Query(s string) ([]models.Recipe, error) {
 	    }
 	}`, s)
 
-	o, err := c.Search(index, "recipe", nil, searchJSON)
+	o, err := c.Conn.Search(index, "recipe", nil, searchJSON)
 	r := BuildResults(o.Hits.Hits)
 
 	return r, err
 }
 
 //Delete a doc from the index
-func Delete(id string) (elastigo.BaseResponse, error) {
-	c := Connect()
-	return c.Delete(index, "recipe", id, nil)
+func (c *Connection) Delete(id string) (elastigo.BaseResponse, error) {
+	return c.Conn.Delete(index, "recipe", id, nil)
 }
 
 //DeleteIndex alll docs from the index
-func DeleteIndex() (elastigo.BaseResponse, error) {
-	c := Connect()
-	return c.DeleteIndex(index)
+func (c *Connection) DeleteIndex() (elastigo.BaseResponse, error) {
+	return c.Conn.DeleteIndex(index)
 }
 
 //BuildResults loop through the hits based on the total hits

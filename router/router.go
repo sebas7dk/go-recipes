@@ -10,7 +10,7 @@ func NewRouter() *mux.Router {
 
 	router := mux.NewRouter().
 		StrictSlash(true).
-		PathPrefix("/api/" + config.ENV["APP_VERSION"]).
+		PathPrefix("/api/" + config.Get("APP_VERSION")).
 		Subrouter()
 
 	for _, route := range routes {

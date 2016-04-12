@@ -10,13 +10,14 @@ import (
 )
 
 var (
-	StrValues = map[string]interface{}{
+	v = map[string]interface{}{
 		"title":        "Fruit Recipe",
 		"ingredients":  "apple, pear, kiwi, banana",
 		"instructions": "Cut the fruit and put it in a bowl.",
 		"time":         10,
 		"people":       2,
 	}
+	c        *Connection
 	recipeId string
 )
 
@@ -29,43 +30,52 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
+	var err error
+
 	if err := config.NewConfig("../.env"); err != nil {
 		log.Fatal("Error loading the .env file")
 	}
 
 	//Use the test index
-	SetIndex(config.ENV["ES_TEST_INDEX"])
+	SetIndex(config.Get("ES_TEST_INDEX"))
+
+	c, err = NewConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func teardown() {
-	if _, err := DeleteIndex(); err != nil {
+	if _, err := c.DeleteIndex(); err != nil {
 		log.Fatal("Error unable to delete the index")
 	}
 }
 
 func TestNewConnection(t *testing.T) {
-	c := Connect()
+	c, err := NewConnection()
 
+	require.Nil(t, err)
 	require.NotNil(t, c)
 }
 
 func TestCreate(t *testing.T) {
 	r := models.Recipe{
-		Title:        StrValues["title"],
-		Time:         IntValues["time"],
-		People:       IntValues["people"],
-		Ingredients:  StrValues["ingredients"],
-		Instructions: StrValues["instructions"],
+		Title:        v["title"].(string),
+		Time:         v["time"].(int),
+		People:       v["people"].(int),
+		Ingredients:  v["ingredients"].(string),
+		Instructions: v["instructions"].(string),
 	}
 
-	o, err := Create(r)
+	o, err := c.Create(r)
 	require.Nil(t, err)
 
 	recipeId = o.Id
 }
 
 func TestShow(t *testing.T) {
-	o, err := Show()
+	o, err := c.Show()
 
 	require.Nil(t, err)
 	require.NotNil(t, o)
@@ -74,17 +84,17 @@ func TestShow(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	o, err := GetById(recipeId)
+	o, err := c.GetById(recipeId)
 
 	require.Nil(t, err)
 	require.NotNil(t, o)
 
 	require.Equal(t, recipeId, o.Id)
-	require.Equal(t, StrValues["title"], o.Title)
-	require.Equal(t, IntValues["time"], o.Time)
-	require.Equal(t, IntValues["people"], o.People)
-	require.Equal(t, StrValues["ingredients"], o.Ingredients)
-	require.Equal(t, StrValues["instructions"], o.Instructions)
+	require.Equal(t, v["title"], o.Title)
+	require.Equal(t, v["time"], o.Time)
+	require.Equal(t, v["people"], o.People)
+	require.Equal(t, v["ingredients"], o.Ingredients)
+	require.Equal(t, v["instructions"], o.Instructions)
 }
 
 func TestUpdate(t *testing.T) {
@@ -94,12 +104,12 @@ func TestUpdate(t *testing.T) {
 		Title: newTitle,
 	}
 
-	o, err := Update(recipeId, r)
+	o, err := c.Update(recipeId, r)
 
 	require.Nil(t, err)
 	require.NotNil(t, o)
 
-	out, err := GetById(recipeId)
+	out, err := c.GetById(recipeId)
 
 	require.Nil(t, err)
 	require.NotNil(t, o)
@@ -108,7 +118,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	o, err := Query(StrValues["title"])
+	o, err := c.Query(v["title"].(string))
 
 	require.Nil(t, err)
 	require.NotNil(t, o)
@@ -117,12 +127,12 @@ func TestQuery(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	o, err := Delete(recipeId)
+	o, err := c.Delete(recipeId)
 
 	require.Nil(t, err)
 	require.NotNil(t, o)
 
-	_, err = GetById(recipeId)
+	_, err = c.GetById(recipeId)
 
 	require.NotNil(t, err)
 }
@@ -130,10 +140,10 @@ func TestDelete(t *testing.T) {
 func CheckRecipes(recipes []models.Recipe, t *testing.T) {
 	for _, r := range recipes {
 		require.Equal(t, recipeId, r.Id)
-		require.Equal(t, StrValues["title"], r.Title)
-		require.Equal(t, IntValues["time"], r.Time)
-		require.Equal(t, IntValues["people"], r.People)
-		require.Equal(t, StrValues["ingredients"], r.Ingredients)
-		require.Equal(t, StrValues["instructions"], r.Instructions)
+		require.Equal(t, v["title"], r.Title)
+		require.Equal(t, v["time"], r.Time)
+		require.Equal(t, v["people"], r.People)
+		require.Equal(t, v["ingredients"], r.Ingredients)
+		require.Equal(t, v["instructions"], r.Instructions)
 	}
 }

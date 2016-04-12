@@ -27,10 +27,10 @@ func TestNewConfig(t *testing.T) {
 }
 
 func TestENV(t *testing.T) {
-	require.NotEmpty(t, ENV[v["port"]])
-	require.NotEmpty(t, ENV[v["version"]])
-	require.NotEmpty(t, ENV[v["es_domain"]])
-	require.NotEmpty(t, ENV[v["es_port"]])
-	require.NotEmpty(t, ENV[v["es_index"]])
-	require.NotEmpty(t, ENV[v["es_test_index"]])
+	require.NotEmpty(t, Get(v["port"]))
+	require.NotEmpty(t, Get(v["version"]))
+	require.NotEmpty(t, Get(v["es_domain"]))
+	require.NotEmpty(t, Get(v["es_port"]))
+	require.NotEmpty(t, Get(v["es_index"]))
+	require.NotEmpty(t, Get(v["es_test_index"]))
 }
