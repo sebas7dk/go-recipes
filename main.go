@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-recipes/config"
-	"github.com/go-recipes/handlers"
-	"github.com/go-recipes/router"
-	"github.com/go-recipes/search"
+	"github.com/sebas7dk/go-recipes/config"
+	"github.com/sebas7dk/go-recipes/handlers"
+	"github.com/sebas7dk/go-recipes/router"
+	"github.com/sebas7dk/go-recipes/search"
 	"github.com/rs/cors"
 )
 

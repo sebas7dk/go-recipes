@@ -8,9 +8,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-recipes/config"
-	"github.com/go-recipes/models"
-	"github.com/go-recipes/search"
+	"github.com/sebas7dk/go-recipes/config"
+	"github.com/sebas7dk/go-recipes/models"
+	"github.com/sebas7dk/go-recipes/search"
 	"github.com/gorilla/mux"
 )
 

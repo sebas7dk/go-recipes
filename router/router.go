@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/go-recipes/config"
+	"github.com/sebas7dk/go-recipes/config"
 	"github.com/gorilla/mux"
 )
 

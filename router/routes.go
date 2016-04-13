@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/go-recipes/handlers"
+	"github.com/sebas7dk/go-recipes/handlers"
 )
 
 type Route struct {
