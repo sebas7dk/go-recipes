@@ -4,8 +4,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/go-recipes/config"
-	"github.com/go-recipes/models"
+	"github.com/sebas7dk/go-recipes/config"
+	"github.com/sebas7dk/go-recipes/models"
 	"github.com/stretchr/testify/require"
 )
 

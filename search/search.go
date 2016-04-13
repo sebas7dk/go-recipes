@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-recipes/config"
-	"github.com/go-recipes/models"
+	"github.com/sebas7dk/go-recipes/config"
+	"github.com/sebas7dk/go-recipes/models"
 	elastigo "github.com/mattbaird/elastigo/lib"
 )
 
