@@ -1,5 +1,7 @@
 # Go Recipes
 
+[![Join the chat at https://gitter.im/sebas7dk/go-recipes](https://badges.gitter.im/sebas7dk/go-recipes.svg)](https://gitter.im/sebas7dk/go-recipes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 An Api to store recipes in Elastic Search
 
 
